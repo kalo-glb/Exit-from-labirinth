@@ -7,7 +7,9 @@
 //#define SERDEBUG
 //#define MOTORSTREIGHT
 OpMode mode = NoMode;
+OpMode prevMode = NoMode;
 U16 fSen = 0;
+U16 lSen = 0;
 
 double input, output, setPoint;
 PID control(&input, &output, &setPoint, 0.5, 0.1, 3.9, DIRECT);
@@ -33,40 +35,35 @@ void loop()
   ProcessSensors();  
   
   #ifdef SERDEBUG
-  Serial.println(input);
-  //sen1 = GetLeftSensor();
-  //sen2 = GetRightSensor();
-  //PrintSensors(sen1, sen2, 0);
+  //Serial.println(input);
+  sen1 = GetLeftSensor();
+  sen2 = GetRightSensor();
+  PrintSensors(sen1, sen2, 0);
   #endif
   
-  fSen = GetForwardSensor();
+  
+  
   #ifndef MOTORSTREIGHT
-  Turn(Right, 127);
- 
-  if(fSen > WallThreshhold)
-  {
-    mode = TurningRight;
-  }
-  else
-  {
-    mode = GoingStreight;
-  }
+    
+  DetermineMode();
   
   if(mode == GoingStreight)
   {
     input = GetPIDInput();
     control.Compute();
-    CheckLeftSide();
     ProcessMotors(int(output));
   }
   else if(mode == TurningRight)
   {
-    Turn(Right, 127);
-    delay(300);
+    ExecuteRightTurn();
+    prevMode = TurningRight;
   }
-  
-  
-  #else
+  else if(mode == TurningLeft)
+  {
+    ExecuteLeftTurn();
+    prevMode = TurningLeft;
+  }
+  #else/*
   // motors set to same speed for streight forward motion
   static boolean phase = 0;
   if(phase == 1)
@@ -78,8 +75,46 @@ void loop()
   {
     ProcessMotors(128);
     phase = 1;
-  }
+  }*/
   #endif
+}
+
+void ExecuteLeftTurn()
+{
+  GoForward(127);
+  delay(100);
+  Turn(Left, 127);
+  delay(280);
+  GoForward(127);
+  delay(1000);
+}
+
+void ExecuteRightTurn()
+{
+  GoBack(127);
+  delay(570);
+  Turn(Right, 127);
+  delay(280);
+  GoForward(127);
+  delay(600);
+}
+
+void DetermineMode()
+{
+  lSen = GetLeftSensor();
+  fSen = GetForwardSensor();
+  if(!fSen)
+  {
+    mode = TurningRight;
+  }
+  else if((lSen < WallThreshhold)/* && (prevMode != TurningLeft)*/)
+  {
+    mode = TurningLeft;
+  }
+  else
+  {
+    mode = GoingStreight;
+  }
 }
 
 void Init(void)
@@ -101,15 +136,6 @@ void Init(void)
   control.SetSampleTime(5);
   control.SetMode(AUTOMATIC);
   control.SetOutputLimits(0, 255);
-}
-
-void CheckLeftSide()
-{
-  lSen = GetLeftSensor();
-  if(lSen < LeftTurnThreshhold)
-  {
-    mode = TurningLeft;
-  }
 }
 
 void PrintSensors(U16 s1, U16 s2, U16 s3)
