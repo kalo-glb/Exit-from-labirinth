@@ -64,7 +64,7 @@ void loop()
     prevMode = TurningLeft;
   }
   #else/*
-  // motors set to same speed for streight forward motion
+  motors set to same speed for streight forward motion
   static boolean phase = 0;
   if(phase == 1)
   {
