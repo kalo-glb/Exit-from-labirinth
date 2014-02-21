@@ -8,8 +8,12 @@
 //#define MOTORSTREIGHT
 OpMode mode = NoMode;
 OpMode prevMode = NoMode;
+U8     modeFrozen = 0;
+
 U16 fSen = 0;
 U16 lSen = 0;
+
+#define TurnDelay 260
 
 double input, output, setPoint;
 PID control(&input, &output, &setPoint, 0.5, 0.1, 3.9, DIRECT);
@@ -81,39 +85,44 @@ void loop()
 
 void ExecuteLeftTurn()
 {
+  FreezeMode();
   GoForward(127);
-  delay(100);
+  delay(50);
   Turn(Left, 127);
-  delay(280);
+  delay(TurnDelay - 20);
   GoForward(127);
   delay(1000);
 }
 
 void ExecuteRightTurn()
 {
+  FreezeMode();
   GoBack(127);
   delay(570);
   Turn(Right, 127);
-  delay(280);
+  delay(TurnDelay + 20);
   GoForward(127);
   delay(600);
 }
 
 void DetermineMode()
 {
-  lSen = GetLeftSensor();
-  fSen = GetForwardSensor();
-  if(!fSen)
+  if(modeFrozen == 0)
   {
-    mode = TurningRight;
-  }
-  else if((lSen < WallThreshhold)/* && (prevMode != TurningLeft)*/)
-  {
-    mode = TurningLeft;
-  }
-  else
-  {
-    mode = GoingStreight;
+    lSen = GetLeftSensor();
+    fSen = GetForwardSensor();
+    if(!fSen)
+    {
+      mode = TurningRight;
+    }
+    else if((lSen < WallThreshhold)/* && (prevMode != TurningLeft)*/)
+    {
+      mode = TurningLeft;
+    }
+    else
+    {
+      mode = GoingStreight;
+    }
   }
 }
 
