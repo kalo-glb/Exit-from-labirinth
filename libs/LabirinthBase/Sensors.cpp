@@ -3,10 +3,8 @@
 #include <base.h>
 
 // Private data
-//static RolingAverage forwardFilt;
 static RolingAverage leftFilt;
 static RolingAverage rightFilt;
-//static U16 fSenVal = 0;
 static U16 lSenVal = 0;
 static U16 rSenVal = 0;
 
@@ -14,28 +12,21 @@ static U16 rSenVal = 0;
 void InitSensors(void)
 {
 	  pinMode(LOSen, INPUT);
-	  //pinMode(FOSen, INPUT);
 	  pinMode(ROSen, INPUT);
 }
 
 U8 IsLeftDistRising()
 {
-	U8 certainty = 0;
-	for(S8 i = (leftFilt.index - 1); i >= 0; i-- )
-	{
-		if(leftFilt.values[])
-	}
+	return IsDistRising(&leftFilt);
 }
 
 U8 IsRightDistRising()
 {
-	
+	return IsDistRising(&rightFilt);
 }
 
 void ProcessSensors(void)
 {
-	  // read sensors
-	//RolingAvrgAddValue(analogRead(FOSen), &forwardFilt);
 	RolingAvrgAddValue(analogRead(LOSen), &leftFilt);
 	RolingAvrgAddValue(analogRead(ROSen), &rightFilt);
 }
@@ -68,6 +59,37 @@ U16 GetRightSensor(void)
 }
 
 // Private functions
+
+U8 IsDistRising(RolingAverage *filter)
+{
+	S8 certainty = 0;
+	U8 i = filter->index - 1;
+	for(; i >= 0; i-- )
+	{
+		if(filter->values[i] < filter->values[(i - 1)])
+		{
+			certainty++;
+		}
+		else
+		{
+			certainty--;
+		}
+	}
+	for(i = (MaxValuesCnt - 1); i >= filter->index; i-- )
+	{
+		if(filter->values[i] < filter->values[i - 1])
+		{
+			certainty++;
+		}
+		else
+		{
+			certainty--;
+		}
+	}
+	
+	return certainty;
+}
+
 void RolingAvrgAddValue(U16 value, RolingAverage *buffer)
 {
 	buffer->values[buffer->index] = value;

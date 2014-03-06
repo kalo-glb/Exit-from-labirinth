@@ -18,6 +18,6 @@ typedef struct tRolAvrg
 void 	RolingAvrgAddValue(U16 value, RolingAverage *buffer);
 U16 	RolingAvrgGetValue(RolingAverage *buffer);
 void 	FillSensorBuf(S16 sensorId, RolingAverage *filter);
-U16		LineariseSensor(U16 filteredValue);
+U8 		IsDistRising(RolingAverage *filter);
 
 #endif

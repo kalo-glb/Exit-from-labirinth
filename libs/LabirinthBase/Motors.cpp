@@ -12,6 +12,7 @@ void Turn(U8 direction, U8 speed)
 {
 	SetMotorDirection(direction, Forward, speed);
 	SetMotorDirection(((direction == Left)? Right : Left), Back, speed);
+	//Serial.println("turn");
 }
 
 void HardStop()
@@ -27,6 +28,7 @@ void GoForward(U16 speed)
 {
 	SetMotorDirection(Left, Forward, speed);
 	SetMotorDirection(Right, Forward, speed);
+	//Serial.println("forward");
 }
 
 void GoBack(U16 speed)
@@ -39,7 +41,7 @@ void SetMotorDirection(U8 motor, U8 direction, U8 speed)
 {
 	//printMotors(motor, direction, speed);
 	speed = CompensateMotor(speed, 200);
-	
+	//Serial.println("speed");
 	if(Right == motor)
 	{
 		//speed = CompensateMotor(speed, 240); // 238

@@ -5,7 +5,7 @@
 #include <Comunication_I.h>
 
 //#define SERDEBUG
-//#define MOTORSTREIGHT
+#define MOTORSTREIGHT
 OpMode mode = NoMode;
 OpMode prevMode = NoMode;
 U8     modeFrozen = 0;
@@ -13,7 +13,7 @@ U8     modeFrozen = 0;
 U16 fSen = 0;
 U16 lSen = 0;
 
-#define TurnDelay 260
+#define TurnDelay 290
 
 double input, output, setPoint;
 PID control(&input, &output, &setPoint, 0.5, 0.1, 3.9, DIRECT);
@@ -27,7 +27,7 @@ void setup()
   Init();
   
   #ifdef SERDEBUG
-  Serial.begin(115200);
+  Serial.begin(9600);
   #endif
 
   setPoint = PIDSetPoint;
@@ -37,25 +37,25 @@ void setup()
 void loop()
 {
   ProcessSensors();  
-  
+  //Serial.println("loop");
   #ifdef SERDEBUG
   //Serial.println(input);
-  sen1 = GetLeftSensor();
-  sen2 = GetRightSensor();
-  PrintSensors(sen1, sen2, 0);
+  //sen1 = GetLeftSensor();
+  //sen2 = GetRightSensor();
+  //PrintSensors(sen1, sen2, 0);
   #endif
-  
-  
-  
+  //Serial.println(IsLeftDistRising());
+ 
   #ifndef MOTORSTREIGHT
-    
   DetermineMode();
   
   if(mode == GoingStreight)
   {
+    //Serial.println("n1");
     input = GetPIDInput();
     control.Compute();
     ProcessMotors(int(output));
+    //Serial.println("norm");
   }
   else if(mode == TurningRight)
   {
@@ -67,8 +67,8 @@ void loop()
     ExecuteLeftTurn();
     prevMode = TurningLeft;
   }
-  #else/*
-  motors set to same speed for streight forward motion
+  #else
+  //motors set to same speed for streight forward motion
   static boolean phase = 0;
   if(phase == 1)
   {
@@ -79,30 +79,30 @@ void loop()
   {
     ProcessMotors(128);
     phase = 1;
-  }*/
+  }
   #endif
 }
 
 void ExecuteLeftTurn()
 {
-  FreezeMode();
+  //FreezeMode();
   GoForward(127);
   delay(50);
   Turn(Left, 127);
-  delay(TurnDelay - 20);
+  delay(TurnDelay - 40);
   GoForward(127);
   delay(1000);
 }
 
 void ExecuteRightTurn()
 {
-  FreezeMode();
+  //FreezeMode();
   GoBack(127);
-  delay(570);
+  delay(520);//540
   Turn(Right, 127);
-  delay(TurnDelay + 20);
+  delay(TurnDelay + 10);
   GoForward(127);
-  delay(600);
+  delay(500);//600
 }
 
 void DetermineMode()
