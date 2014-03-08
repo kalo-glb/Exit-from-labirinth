@@ -5,7 +5,7 @@
 #include <Comunication_I.h>
 
 //#define SERDEBUG
-#define MOTORSTREIGHT
+//#define MOTORSTREIGHT
 OpMode mode = NoMode;
 OpMode prevMode = NoMode;
 U8     modeFrozen = 0;
@@ -141,6 +141,7 @@ void Init(void)
   digitalWrite(A5, LOW);
   
   InitSensors();
+  InitMotors();
   
   control.SetSampleTime(5);
   control.SetMode(AUTOMATIC);
