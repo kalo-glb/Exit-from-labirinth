@@ -4,41 +4,45 @@
 
 void ProcessMotors(U16 PIDResult)
 {
-	SetMotorDirection(Left, Forward, PIDResult);
-	SetMotorDirection(Right, Forward, 255 - PIDResult);
+	UpdateMotors(PIDResult, Forward, (255 - PIDResult), Forward);
 }
 
 void Turn(U8 direction, U8 speed)
 {
-	SetMotorDirection(direction, Forward, speed);
-	SetMotorDirection(((direction == Left)? Right : Left), Back, speed);
-	//Serial.println("turn");
+	UpdateMotors(
+			speed, 
+			((direction == Left)? Back : Forward), 
+			speed, 
+			((direction == Left)? Forward : Back)
+			);
 }
 
+/*
 void HardStop()
 {
+//#error "do not use"
 	SetMotorDirection(Left, Back, 100);
 	SetMotorDirection(Right, Back, 100);
 	delay(50);
 	SetMotorDirection(Left, Back, 0);
 	SetMotorDirection(Right, Back, 0);
 }
+*/
 
-void GoForward(U16 speed)
+void GoForward(U8 speed)
 {
-	SetMotorDirection(Left, Forward, speed);
-	SetMotorDirection(Right, Forward, speed);
-	//Serial.println("forward");
+	UpdateMotors(speed, Forward, speed, Forward);
 }
 
-void GoBack(U16 speed)
+void GoBack(U8 speed)
 {
-	SetMotorDirection(Left, Back, speed);
-	SetMotorDirection(Right, Back, speed);
+	UpdateMotors(speed, Back, speed, Back);
 }
 
+/*
 void SetMotorDirection(U8 motor, U8 direction, U8 speed)
 {
+//#error deprecated
 	//printMotors(motor, direction, speed);
 	speed = CompensateMotor(speed, 200);
 	//Serial.println("speed");
@@ -70,6 +74,44 @@ void SetMotorDirection(U8 motor, U8 direction, U8 speed)
 			analogWrite(LMotorB, speed);
 		}
 	}
+}
+*/
+
+void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
+{
+	if(Forward == leftDir)
+	{
+		digitalWrite(LMotorF, HIGH);
+		digitalWrite(LMotorB, LOW);
+	}
+	else if(Back == leftDir)
+	{
+		digitalWrite(LMotorF, LOW);
+		digitalWrite(LMotorB, HIGH);
+	}
+	analogWrite(LSpeed, leftSpeed);
+	
+	if(Forward == rightDir)
+	{
+		digitalWrite(RMotorF, HIGH);
+		digitalWrite(RMotorB, LOW);
+	}
+	else if(Back == rightDir)
+	{
+		digitalWrite(RMotorF, LOW);
+		digitalWrite(RMotorB, HIGH);
+	}
+	analogWrite(RSpeed, leftSpeed);
+}
+
+void InitMotors()
+{
+	pinMode(LSpeed, OUTPUT);
+	pinMode(RSpeed, OUTPUT);
+	pinMode(LMotorF, OUTPUT);
+	pinMode(LMotorB, OUTPUT);
+	pinMode(RMotorF, OUTPUT);
+	pinMode(RMotorB, OUTPUT);
 }
 
 U8 CompensateMotor(U8 speed, U8 factorFrom255)
