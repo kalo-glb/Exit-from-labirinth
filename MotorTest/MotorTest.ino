@@ -1,4 +1,4 @@
-byte MotorsArray[4] = {3, 9, 5, 6};
+byte MotorsArray[4] = {10, 9, 5, 3};
 
 #define LeftForward   MotorsArray[0]
 #define LeftBack      MotorsArray[1]

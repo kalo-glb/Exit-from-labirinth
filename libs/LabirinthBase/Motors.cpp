@@ -40,6 +40,7 @@ void GoBack(U8 speed)
 }
 
 /*
+//deprecated
 void SetMotorDirection(U8 motor, U8 direction, U8 speed)
 {
 //#error deprecated
@@ -75,8 +76,8 @@ void SetMotorDirection(U8 motor, U8 direction, U8 speed)
 		}
 	}
 }
-*/
 
+//tb6612f
 void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
 {
 	if(Forward == leftDir)
@@ -103,11 +104,38 @@ void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
 	}
 	analogWrite(RSpeed, leftSpeed);
 }
+*/
+
+//l293b
+void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
+{
+    if(Forward == leftDir)
+    {
+        analogWrite(LMotorF, leftSpeed);
+        digitalWrite(LMotorB, LOW);
+    }
+    else if(Back == leftDir)
+    {
+        analogWrite(LMotorB, leftSpeed);
+        digitalWrite(LMotorF, LOW);
+    }
+    
+    if(Forward == rightDir)
+    {
+        analogWrite(RMotorF, rightSpeed);
+        digitalWrite(RMotorB, LOW);
+    }
+    else if(Back == rightDir)
+    {
+        analogWrite(RMotorB, rightSpeed);
+        digitalWrite(RMotorF, LOW);
+    }
+}
 
 void InitMotors()
 {
-	pinMode(LSpeed, OUTPUT);
-	pinMode(RSpeed, OUTPUT);
+	//pinMode(LSpeed, OUTPUT);
+	//pinMode(RSpeed, OUTPUT);
 	pinMode(LMotorF, OUTPUT);
 	pinMode(LMotorB, OUTPUT);
 	pinMode(RMotorF, OUTPUT);
