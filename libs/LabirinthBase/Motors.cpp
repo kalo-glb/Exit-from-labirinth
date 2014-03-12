@@ -60,6 +60,7 @@ void SetMotorDirection(U8 motor, U8 direction, U8 speed)
 			digitalWrite(RMotorF, 0);
 			analogWrite(RMotorB, speed);
 		}
+
 	}
 	else if(Left == motor)
 	{
@@ -73,6 +74,7 @@ void SetMotorDirection(U8 motor, U8 direction, U8 speed)
 		{
 			digitalWrite(LMotorF, 0);
 			analogWrite(LMotorB, speed);
+
 		}
 	}
 }
@@ -109,6 +111,8 @@ void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
 //l293b
 void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
 {
+    // compensate left motor speed
+    leftSpeed = CompensateMotor(leftSpeed, 180);
     if(Forward == leftDir)
     {
         analogWrite(LMotorF, leftSpeed);
@@ -134,6 +138,7 @@ void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
 
 void InitMotors()
 {
+
 	//pinMode(LSpeed, OUTPUT);
 	//pinMode(RSpeed, OUTPUT);
 	pinMode(LMotorF, OUTPUT);
