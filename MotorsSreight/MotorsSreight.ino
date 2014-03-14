@@ -1,3 +1,4 @@
+#include <base.h>
 #include <Motors_I.h>
 
 void setup()
@@ -7,5 +8,5 @@ void setup()
 
 void loop()
 {
-  GoForward(126);
+  Turn(Right, 126);
 }

@@ -128,7 +128,7 @@ void ExecuteRightTurn()
       if(False == IsTimerStarted(turnTimer))
         StartTimer(&turnTimer);
       //Serial.println("l2");
-      Turn(Left, 150);
+      Turn(Right, 150);
       
       if(False != IsTimerExpired(turnTimer, (TurnDelay)))
         stage += 1;
