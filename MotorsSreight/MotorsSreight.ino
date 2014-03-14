@@ -7,5 +7,5 @@ void setup()
 
 void loop()
 {
-  ProcessMotors(126);
+  GoForward(126);
 }

@@ -11,9 +11,9 @@ void Turn(U8 direction, U8 speed)
 {
 	UpdateMotors(
 			speed, 
-			((direction == Left)? Back : Forward), 
+			((direction == Left)? Forward : Back), 
 			speed, 
-			((direction == Left)? Forward : Back)
+			((direction == Left)? Back : Forward)
 			);
 }
 
@@ -112,7 +112,7 @@ void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
 void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
 {
     // compensate left motor speed
-    rightSpeed = CompensateMotor(rightSpeed, 240);
+    rightSpeed = CompensateMotor(rightSpeed, 230);
     if(Forward == leftDir)
     {
         analogWrite(LMotorF, leftSpeed);

@@ -4,9 +4,9 @@
 #include <Motors_I.h>
 #include <Comunication_I.h>
 
-OpMode mode = NoMode;
-OpMode prevMode = NoMode;
-U8     modeFrozen = 0;
+static OpMode mode = NoMode;
+static OpMode prevMode = NoMode;
+static U8     modeFrozen = 0;
 
 U16 fSen = 0;
 U16 lSen = 0;
@@ -20,6 +20,8 @@ void setup()
 
   setPoint = PIDSetPoint;
   mode = GoingStreight;
+  
+  //Serial.begin(9600);
 }
 
 void loop()
@@ -47,22 +49,109 @@ void loop()
 
 void ExecuteLeftTurn()
 {
-  GoForward(127);
-  delay(50);
-  Turn(Left, 127);
-  delay(TurnDelay - 40);
-  GoForward(127);
-  delay(1000);
+  static U32 forwardTimer1 = 0;
+  static U32 turnTimer     = 0;
+  static U32 forwardTimer2 = 0;
+  static U8  stage = 0;
+  
+  switch(stage)
+  {
+    case 0:
+    {
+      if(False == IsTimerStarted(forwardTimer1))
+      {
+        StartTimer(&forwardTimer1);
+        modeFrozen = True;
+      }
+      
+      GoForward(127);
+      
+      if(False != IsTimerExpired(forwardTimer1, 50))
+        stage += 1;
+    }
+    break;
+    case 1:
+    {
+      if(False == IsTimerStarted(turnTimer))
+        StartTimer(&turnTimer);
+      
+      Turn(Left, 127);
+      
+      if(False != IsTimerExpired(turnTimer, (TurnDelay - 40)))
+        stage += 1;
+    }
+    break;
+    case 2:
+    {
+      if(False == IsTimerStarted(turnTimer))
+        StartTimer(&turnTimer);
+      
+      GoForward(127);
+      
+      if(False != IsTimerExpired(turnTimer, 1000))
+      {
+        forwardTimer1 = 0;
+        turnTimer     = 0;
+        forwardTimer2 = 0;
+        stage = 0;
+        modeFrozen = False;
+      }
+    }
+    break;
+  }
 }
 
 void ExecuteRightTurn()
 {
-  GoBack(127);
-  delay(520);//540
-  Turn(Right, 127);
-  delay(TurnDelay + 10);
-  GoForward(127);
-  delay(500);//600
+  static U32 forwardTimer1 = 0;
+  static U32 turnTimer     = 0;
+  static U32 forwardTimer2 = 0;
+  static U8  stage = 0;
+  switch(stage)
+  {
+    case 0:
+    {
+      if(False == IsTimerStarted(forwardTimer1))
+      {
+        StartTimer(&forwardTimer1);
+        modeFrozen = True;
+      }
+      //Serial.println("l1");
+      GoBack(127);
+      
+      if(False != IsTimerExpired(forwardTimer1, 1000))
+        stage += 1;
+    }
+    break;
+    case 1:
+    {
+      if(False == IsTimerStarted(turnTimer))
+        StartTimer(&turnTimer);
+      //Serial.println("l2");
+      Turn(Left, 150);
+      
+      if(False != IsTimerExpired(turnTimer, (TurnDelay)))
+        stage += 1;
+    }
+    break;
+    case 2:
+    {
+      if(False == IsTimerStarted(turnTimer))
+        StartTimer(&turnTimer);
+      //Serial.println("l3");
+      GoForward(127);
+      
+      if(False != IsTimerExpired(turnTimer, 500))
+      {
+        forwardTimer1 = 0;
+        turnTimer     = 0;
+        forwardTimer2 = 0;
+        stage = 0;
+        modeFrozen = False;
+      }
+    }
+    break;
+  }
 }
 
 void DetermineMode()
@@ -83,6 +172,10 @@ void DetermineMode()
     {
       mode = GoingStreight;
     }
+  }
+  else
+  {
+    //Serial.println("modeFrozen");
   }
 }
 
@@ -106,4 +199,40 @@ void Init(void)
   control.SetSampleTime(5);
   control.SetMode(AUTOMATIC);
   control.SetOutputLimits(0, 255);
+}
+
+void StartTimer(U32 *timerAddr)
+{
+    *timerAddr = millis();
+}
+
+U8 IsTimerExpired(U32 timerAddr, U32 timerDelay)
+{
+    if(False != IsTimerStarted(timerAddr))
+    {
+        if((timerAddr + timerDelay) < (millis()))
+        {
+            return True;
+        }
+        else
+        {
+            return False;
+        }
+    }
+    else
+    {
+        return False;
+    }
+}
+
+U8 IsTimerStarted(U32 timerAddr)
+{
+    if(0 != timerAddr)
+    {
+        return True;
+    }
+    else
+    {
+        return False;
+    }
 }
