@@ -112,7 +112,7 @@ void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
 void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
 {
     // compensate left motor speed
-    leftSpeed = CompensateMotor(leftSpeed, 180);
+    rightSpeed = CompensateMotor(rightSpeed, 240);
     if(Forward == leftDir)
     {
         analogWrite(LMotorF, leftSpeed);

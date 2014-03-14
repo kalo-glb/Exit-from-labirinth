@@ -3,7 +3,7 @@
 
 #include <base.h>
 
-#define WallThreshhold 140
+#define WallThreshhold 180
 
 void 	ProcessSensors(void);
 void	InitSensors(void);

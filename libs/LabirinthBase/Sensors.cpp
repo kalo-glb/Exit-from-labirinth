@@ -38,7 +38,7 @@ double GetPIDInput(void)
 	lSenVal = RolingAvrgGetValue(&leftFilt);
 	rSenVal = RolingAvrgGetValue(&rightFilt);
 	
-	result = (double)(((PIDSetPoint + lSenVal) - rSenVal) - 150);
+	result = (double)(((PIDSetPoint + lSenVal) - rSenVal) - 250);
 	
 	return result;
 }

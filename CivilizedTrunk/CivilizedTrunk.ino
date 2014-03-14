@@ -11,8 +11,6 @@ U8     modeFrozen = 0;
 U16 fSen = 0;
 U16 lSen = 0;
 
-#define TurnDelay 350
-
 double input, output, setPoint;
 PID control(&input, &output, &setPoint, 0.5, 0.1, 3.9, DIRECT);
 
@@ -29,27 +27,21 @@ void loop()
   ProcessSensors();  
   DetermineMode();
   
-  /*
   switch(mode)
   {
-    
-  }
-  */
-  if(mode == GoingStreight)
-  {
+  case GoingStreight:
     input = GetPIDInput();
     control.Compute();
     ProcessMotors(int(output));
-  }
-  else if(mode == TurningRight)
-  {
+    break;
+  case TurningRight:
     ExecuteRightTurn();
     prevMode = TurningRight;
-  }
-  else if(mode == TurningLeft)
-  {
+    break;
+  case TurningLeft:
     ExecuteLeftTurn();
     prevMode = TurningLeft;
+    break;
   }
 }
 
@@ -57,7 +49,7 @@ void ExecuteLeftTurn()
 {
   GoForward(127);
   delay(50);
-  Turn(Right, 127);
+  Turn(Left, 127);
   delay(TurnDelay - 40);
   GoForward(127);
   delay(1000);
@@ -67,7 +59,7 @@ void ExecuteRightTurn()
 {
   GoBack(127);
   delay(520);//540
-  Turn(Left, 127);
+  Turn(Right, 127);
   delay(TurnDelay + 10);
   GoForward(127);
   delay(500);//600
