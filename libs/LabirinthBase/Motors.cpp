@@ -2,6 +2,9 @@
 #include <Motors_I.h>
 #include <Motors_Cfg.h>
 
+static Motors *motors;
+static Motors *oldMotors;
+
 void ProcessMotors(U16 PIDResult)
 {
 	UpdateMotors(PIDResult, Forward, (255 - PIDResult), Forward);
@@ -17,18 +20,6 @@ void Turn(U8 direction, U8 speed)
 			);
 }
 
-/*
-void HardStop()
-{
-//#error "do not use"
-	SetMotorDirection(Left, Back, 100);
-	SetMotorDirection(Right, Back, 100);
-	delay(50);
-	SetMotorDirection(Left, Back, 0);
-	SetMotorDirection(Right, Back, 0);
-}
-*/
-
 void GoForward(U8 speed)
 {
 	UpdateMotors(speed, Forward, speed, Forward);
@@ -43,10 +34,7 @@ void GoBack(U8 speed)
 //deprecated
 void SetMotorDirection(U8 motor, U8 direction, U8 speed)
 {
-//#error deprecated
-	//printMotors(motor, direction, speed);
 	speed = CompensateMotor(speed, 200);
-	//Serial.println("speed");
 	if(Right == motor)
 	{
 		//speed = CompensateMotor(speed, 240); // 238
@@ -106,11 +94,27 @@ void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
 	}
 	analogWrite(RSpeed, leftSpeed);
 }
+
+U8 IsChangeInMotors(Motors *motors, Motors *oldMotors)
+{
+    U8 i = 0;
+    for(;i < sizeof(Motors);i++)
+    {
+        if(((U8 *)motors)[i] != ((U8 *)oldMotors)[i])
+        {
+            return True;
+        }
+    }
+    
+    return False;
+}
 */
 
 //l293b
 void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
 {
+    //if(False != IsChangeInMotors(motors, oldMotors))
+    //{
     // compensate left motor speed
     rightSpeed = CompensateMotor(rightSpeed, 230);
     if(Forward == leftDir)
@@ -134,17 +138,26 @@ void UpdateMotors(U8 leftSpeed, U8 leftDir, U8 rightSpeed, U8 rightDir)
         analogWrite(RMotorB, rightSpeed);
         digitalWrite(RMotorF, LOW);
     }
+    //}
 }
 
 void InitMotors()
 {
-
+    //tb6612f
 	//pinMode(LSpeed, OUTPUT);
 	//pinMode(RSpeed, OUTPUT);
 	pinMode(LMotorF, OUTPUT);
 	pinMode(LMotorB, OUTPUT);
 	pinMode(RMotorF, OUTPUT);
 	pinMode(RMotorB, OUTPUT);
+	
+	/*
+	motors = (Motors *)malloc(sizeof(Motors));
+	oldMotors = (Motors *)malloc(sizeof(Motors));
+	
+	memset((void *)oldMotors, 0, sizeof(oldMotors));
+	memset((void *)motors, 0, sizeof(oldMotors));
+	*/
 }
 
 U8 CompensateMotor(U8 speed, U8 factorFrom255)

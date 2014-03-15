@@ -11,31 +11,20 @@
 #define U32 uint32_t
 #define S32 signed long
 
-#define True  (U8)1
-#define False (U8)0
+typedef enum bools
+{
+    False = 0,
+    True  = 1
+} Boolean;
 
 // Motors
-#define Left  	0
-#define Right 	1
+typedef enum sides
+{
+    Left = 0,
+    Right = 1
+} Sides;
 
 #define PIDSetPoint 1200
 #define TurnDelay 350
-
-// Logic
-typedef enum tOpMode
-{
-	NoMode,
-    GoingStreight,
-    TurningLeft,
-    TurningRight,
-    TurnedLeft,
-    TurnedRight
-} OpMode;
-
-/*
-void StartTimer(U32 *timerAddr);
-U8   IsTimerExpired(U32 timerAddr, U32 timerDelay);
-U8   IsTimerStarted(U32 timerAddr);
-*/
 
 #endif
